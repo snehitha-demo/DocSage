@@ -1,0 +1,335 @@
+import { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Upload as UploadIcon, FileText, X, Check, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const STATIC_SUMMARIES = {
+  contract: {
+    summary: "This comprehensive service agreement establishes a professional relationship between the service provider and client. The document outlines key terms including scope of services, payment terms with a 30-day net arrangement, confidentiality obligations protecting both parties' proprietary information, and intellectual property rights ensuring proper ownership. The agreement includes standard termination clauses, liability limitations, and dispute resolution procedures. Both parties commit to maintaining professional standards and timely communication throughout the engagement period.",
+    insights: [
+      "Payment terms: Net 30 days from invoice date",
+      "Confidentiality clause protects sensitive business information",
+      "Either party can terminate with 30 days written notice",
+      "Includes standard liability limitations and indemnification",
+      "Intellectual property rights clearly defined"
+    ],
+    tags: ["legal", "agreement", "business", "services"]
+  },
+  report: {
+    summary: "This detailed quarterly business analysis report examines performance metrics across all major departments including sales, operations, and customer satisfaction. The report reveals strong revenue growth of 23% year-over-year, driven primarily by expansion in digital channels and new product launches. Customer retention rates improved by 15%, indicating enhanced service quality. The analysis includes comprehensive market trend evaluation, competitive positioning assessment, and strategic recommendations for the upcoming quarter. Key performance indicators show positive momentum across all measured categories.",
+    insights: [
+      "Revenue increased 23% compared to previous year",
+      "Customer retention improved by 15% quarter-over-quarter",
+      "Digital sales channel contributed 45% of total revenue",
+      "Operating expenses decreased by 8% through efficiency measures",
+      "Market share expanded in three key demographic segments"
+    ],
+    tags: ["quarterly", "performance", "analysis", "metrics"]
+  },
+  invoice: {
+    summary: "Professional services invoice for consulting engagement covering strategic planning and implementation support. The document itemizes services provided including initial assessment, strategy development sessions, implementation planning, and ongoing advisory support. Payment terms clearly specified with itemized breakdown of hourly rates and total hours worked. Invoice includes complete billing address, payment instructions, and terms. Services were delivered on schedule with full client satisfaction. All deliverables completed as per statement of work.",
+    insights: [
+      "Total amount due: Based on hourly consultation rates",
+      "Payment due within 30 days of invoice date",
+      "Services include strategy development and implementation",
+      "Detailed breakdown of hours and services provided",
+      "Standard late payment terms apply after due date"
+    ],
+    tags: ["billing", "payment", "professional services", "consulting"]
+  },
+  proposal: {
+    summary: "Comprehensive business proposal outlining a strategic partnership opportunity between organizations. The proposal details project objectives, implementation methodology, resource allocation, timeline spanning 6 months, and expected outcomes. Financial projections indicate potential ROI of 180% within the first year. The document includes detailed risk assessment, mitigation strategies, and success metrics. Proposed solution addresses current market challenges while positioning both parties for sustainable growth. Implementation plan includes phased approach with clear milestones and deliverables.",
+    insights: [
+      "Projected ROI of 180% within first year of implementation",
+      "6-month implementation timeline with defined milestones",
+      "Resource requirements clearly outlined with budget allocation",
+      "Risk mitigation strategies included for major challenges",
+      "Success metrics tied to measurable business outcomes"
+    ],
+    tags: ["business proposal", "partnership", "strategy", "growth"]
+  },
+  research: {
+    summary: "In-depth research paper examining emerging market trends and consumer behavior patterns across multiple industries. The study analyzes data from over 10,000 survey responses, combining quantitative metrics with qualitative insights. Key findings reveal significant shifts in purchasing behaviors, with 67% of consumers prioritizing sustainability factors. The research methodology employed rigorous statistical analysis and peer review. Results demonstrate strong correlations between brand values and customer loyalty. Recommendations provide actionable insights for marketing strategies and product development initiatives.",
+    insights: [
+      "Survey sample size: 10,000+ respondents across diverse demographics",
+      "67% of consumers prioritize sustainability in purchasing decisions",
+      "Strong correlation found between brand authenticity and loyalty",
+      "Mobile commerce adoption increased 45% year-over-year",
+      "Personalization drives 32% higher engagement rates"
+    ],
+    tags: ["market research", "consumer behavior", "data analysis", "trends"]
+  },
+  legal: {
+    summary: "Comprehensive legal document addressing contractual obligations, regulatory compliance requirements, and liability protections for all involved parties. The document includes detailed provisions for dispute resolution through mediation and arbitration, jurisdiction specifications, and governing law clauses. Standard legal language ensures enforceability while protecting parties' interests. Includes force majeure provisions, amendment procedures, and severability clauses. Document reviewed by legal counsel and complies with current regulatory standards and industry best practices.",
+    insights: [
+      "Dispute resolution through mediation before arbitration",
+      "Comprehensive liability protections and indemnification clauses",
+      "Force majeure provisions for unforeseen circumstances",
+      "Governing law and jurisdiction clearly specified",
+      "Amendment procedures require written consent from all parties"
+    ],
+    tags: ["legal document", "compliance", "liability", "contracts"]
+  },
+  technical: {
+    summary: "Detailed technical specification document covering system architecture, API documentation, security protocols, and implementation guidelines. The document provides comprehensive coverage of technical requirements including scalability considerations, performance benchmarks, and integration specifications. Security section details authentication mechanisms, encryption standards (AES-256), and access control protocols. API documentation includes endpoint specifications, request/response formats, and error handling procedures. Implementation guide provides step-by-step instructions with code examples and best practices.",
+    insights: [
+      "System designed for horizontal scalability up to 10M users",
+      "API follows RESTful design principles with JWT authentication",
+      "End-to-end encryption using AES-256 standard",
+      "Performance benchmarks: 99.9% uptime, <100ms response time",
+      "Comprehensive error handling and logging mechanisms included"
+    ],
+    tags: ["technical specs", "API", "architecture", "implementation"]
+  },
+  other: {
+    summary: "This document contains important information and detailed content relevant to various business operations and organizational processes. The material covers multiple topics including operational procedures, guidelines, and reference information. Content has been organized systematically for easy reference and includes supporting documentation. The document serves as a comprehensive resource for stakeholders and provides valuable context for decision-making processes. All information has been verified for accuracy and completeness.",
+    insights: [
+      "Comprehensive coverage of multiple business topics",
+      "Organized systematically for quick reference access",
+      "Includes supporting documentation and appendices",
+      "Serves as valuable resource for stakeholders",
+      "Regular updates maintain accuracy and relevance"
+    ],
+    tags: ["reference", "documentation", "business", "resources"]
+  }
+};
+
+export default function UploadPage() {
+  const navigate = useNavigate();
+  const [file, setFile] = useState(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileSelect = (selectedFile) => {
+    if (selectedFile && selectedFile.type === "application/pdf") {
+      setFile(selectedFile);
+      if (!title) {
+        setTitle(selectedFile.name.replace('.pdf', ''));
+      }
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!file || !title || !category) return;
+
+    setIsUploading(true);
+
+    const staticData = STATIC_SUMMARIES[category] || STATIC_SUMMARIES.other;
+    const pageCount = Math.floor(Math.random() * 15) + 5;
+
+    // Create document with static AI data
+    await base44.entities.Document.create({
+      title,
+      description,
+      category,
+      file_url: "https://images.unsplash.com/photo-1568667256549-094345857637?w=800",
+      file_size: file.size,
+      page_count: pageCount,
+      ai_summary: staticData.summary,
+      key_insights: staticData.insights,
+      tags: staticData.tags,
+      status: "ready"
+    });
+
+    setIsUploading(false);
+    navigate(createPageUrl("Documents"));
+  };
+
+  return (
+    <div className="p-6 md:p-8 min-h-screen">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">Upload Document</h1>
+          <p className="text-slate-600">Upload a document for AI-powered analysis and insights</p>
+        </div>
+
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <Sparkles className="w-4 h-4 text-blue-600" />
+          <AlertDescription className="text-blue-800">
+            This is a prototype version. AI summaries and insights are pre-generated for demonstration purposes.
+          </AlertDescription>
+        </Alert>
+
+        <Card className="shadow-lg border-none">
+          <CardHeader className="border-b border-slate-200">
+            <CardTitle className="text-xl font-bold text-slate-900">Document Details</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* File Upload */}
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Upload File (PDF)</Label>
+                <div
+                  className={`border-2 border-dashed rounded-xl p-8 transition-all duration-200 ${
+                    dragActive 
+                      ? "border-blue-500 bg-blue-50" 
+                      : "border-slate-300 hover:border-slate-400"
+                  }`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                >
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={(e) => handleFileSelect(e.target.files[0])}
+                    className="hidden"
+                    id="file-upload"
+                  />
+                  
+                  {!file ? (
+                    <label htmlFor="file-upload" className="cursor-pointer">
+                      <div className="text-center">
+                        <UploadIcon className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+                        <p className="text-slate-600 font-medium mb-1">
+                          Drop your PDF here or click to browse
+                        </p>
+                        <p className="text-sm text-slate-500">
+                          PDF files only, max 50MB
+                        </p>
+                      </div>
+                    </label>
+                  ) : (
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <FileText className="w-8 h-8 text-blue-600" />
+                        <div>
+                          <p className="font-medium text-slate-900">{file.name}</p>
+                          <p className="text-sm text-slate-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setFile(null)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Title */}
+              <div>
+                <Label htmlFor="title" className="text-sm font-medium mb-2 block">
+                  Document Title *
+                </Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter document title"
+                  required
+                  className="h-11"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <Label htmlFor="category" className="text-sm font-medium mb-2 block">
+                  Category *
+                </Label>
+                <Select value={category} onValueChange={setCategory} required>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="contract">Contract</SelectItem>
+                    <SelectItem value="report">Report</SelectItem>
+                    <SelectItem value="invoice">Invoice</SelectItem>
+                    <SelectItem value="proposal">Proposal</SelectItem>
+                    <SelectItem value="research">Research</SelectItem>
+                    <SelectItem value="legal">Legal</SelectItem>
+                    <SelectItem value="technical">Technical</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Description */}
+              <div>
+                <Label htmlFor="description" className="text-sm font-medium mb-2 block">
+                  Description (Optional)
+                </Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Add a brief description"
+                  rows={4}
+                />
+              </div>
+
+              {/* Submit Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate(createPageUrl("Documents"))}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={!file || !title || !category || isUploading}
+                  className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  {isUploading ? (
+                    <>
+                      <span className="mr-2">Processing...</span>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Upload & Analyze
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
