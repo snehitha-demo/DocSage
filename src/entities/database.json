@@ -1,0 +1,72 @@
+{
+  "name": "Document",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Document title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the document"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "contract",
+        "report",
+        "invoice",
+        "proposal",
+        "research",
+        "legal",
+        "technical",
+        "other"
+      ],
+      "description": "Document category"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL to the uploaded document"
+    },
+    "file_size": {
+      "type": "number",
+      "description": "File size in bytes"
+    },
+    "page_count": {
+      "type": "number",
+      "description": "Number of pages in document"
+    },
+    "ai_summary": {
+      "type": "string",
+      "description": "AI-generated summary of the document"
+    },
+    "key_insights": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key insights extracted from document"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Document tags for categorization"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "processing",
+        "ready",
+        "archived"
+      ],
+      "default": "ready",
+      "description": "Document processing status"
+    }
+  },
+  "required": [
+    "title",
+    "category"
+  ]
+}

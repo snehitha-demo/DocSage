@@ -134,26 +134,37 @@ export default function Upload() {
     try {
       const summaryData = STATIC_SUMMARIES[formData.category] || STATIC_SUMMARIES.other;
       
+      // Create document object following database.json schema
       const documentData = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        file_url: URL.createObjectURL(selectedFile),
+        file_url: selectedFile.name, // Simple file reference
         file_size: selectedFile.size,
         page_count: Math.floor(Math.random() * 50) + 1,
         ai_summary: summaryData.summary,
         key_insights: summaryData.insights,
         tags: summaryData.tags,
-        status: 'ready',
-        created_date: new Date().toISOString()
+        status: 'ready'
       };
 
-      await base44.entities.Document.create(documentData);
-      toast.success("Document uploaded successfully!");
-      navigate(createPageUrl("Documents"));
+      // Send to API
+      const response = await base44.entities.Document.create(documentData);
+      
+      if (response && response.id) {
+        toast.success("Document uploaded successfully!");
+        setSelectedFile(null);
+        setFormData({ title: "", description: "", category: "" });
+        // Delay navigation to show the success toast
+        setTimeout(() => {
+          navigate(createPageUrl("Documents"));
+        }, 1500);
+      } else {
+        toast.error("Upload response invalid");
+      }
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error("Failed to upload document");
+      toast.error("Failed to upload document. Check browser console for details.");
     } finally {
       setUploading(false);
     }

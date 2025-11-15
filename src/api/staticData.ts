@@ -1,0 +1,119 @@
+// Static documents dataset
+export const DOCUMENTS_DATA = [
+  {
+    "id": "1",
+    "title": "Service Agreement",
+    "description": "Master service agreement between parties",
+    "category": "contract",
+    "file_url": "service-agreement.pdf",
+    "file_size": 245000,
+    "page_count": 12,
+    "ai_summary": "Comprehensive service agreement outlining terms of engagement, service levels, payment terms, and termination conditions.",
+    "key_insights": [
+      "Annual contract with auto-renewal",
+      "Payment terms: Net 30",
+      "SLA: 99.5% uptime guarantee",
+      "Termination: 30 days notice"
+    ],
+    "tags": [
+      "agreement",
+      "services",
+      "legal"
+    ],
+    "status": "ready",
+    "created_date": "2025-11-10T10:30:00Z"
+  },
+  {
+    "id": "2",
+    "title": "Q3 Financial Report 2025",
+    "description": "Quarterly financial performance report",
+    "category": "report",
+    "file_url": "q3-2025-report.pdf",
+    "file_size": 890000,
+    "page_count": 25,
+    "ai_summary": "Financial report showing 15% revenue growth, improved margins, and strong cash flow. Key metrics indicate healthy business performance.",
+    "key_insights": [
+      "Revenue: $2.5M (+15% YoY)",
+      "Operating margin: 22%",
+      "Cash position: $1.2M",
+      "Customer retention: 94%"
+    ],
+    "tags": [
+      "financials",
+      "q3",
+      "performance"
+    ],
+    "status": "ready",
+    "created_date": "2025-11-08T14:15:00Z"
+  },
+  {
+    "id": "3",
+    "title": "Invoice #2025-001",
+    "description": "Project delivery invoice",
+    "category": "invoice",
+    "file_url": "invoice-2025-001.pdf",
+    "file_size": 125000,
+    "page_count": 2,
+    "ai_summary": "Invoice for software development services rendered in November 2025. Total amount due: $15,000.",
+    "key_insights": [
+      "Amount: $15,000",
+      "Due date: December 15, 2025",
+      "Services: Web development (80 hours)",
+      "Payment method: Wire transfer"
+    ],
+    "tags": [
+      "invoice",
+      "development",
+      "november"
+    ],
+    "status": "ready",
+    "created_date": "2025-11-12T09:00:00Z"
+  },
+  {
+    "id": "4",
+    "title": "Product Proposal 2025",
+    "description": "New product launch proposal",
+    "category": "proposal",
+    "file_url": "product-proposal-2025.pdf",
+    "file_size": 567000,
+    "page_count": 18,
+    "ai_summary": "Proposal for launching new AI-powered document analysis platform. Projected ROI: 250% within 18 months.",
+    "key_insights": [
+      "Market size: $500M",
+      "Target launch: Q1 2026",
+      "Initial investment: $2M",
+      "Projected revenue year 1: $5M"
+    ],
+    "tags": [
+      "ai",
+      "product",
+      "launch"
+    ],
+    "status": "ready",
+    "created_date": "2025-11-09T11:45:00Z"
+  },
+  {
+    "id": "5",
+    "title": "Machine Learning Research Paper",
+    "description": "Research on document classification using transformers",
+    "category": "research",
+    "file_url": "ml-research-paper.pdf",
+    "file_size": 2100000,
+    "page_count": 42,
+    "ai_summary": "Academic research paper on using transformer models for document classification. Achieves 96% accuracy on benchmark datasets.",
+    "key_insights": [
+      "Model: BERT-based classifier",
+      "Accuracy: 96%",
+      "F1 Score: 0.94",
+      "Training data: 50K documents"
+    ],
+    "tags": [
+      "ml",
+      "nlp",
+      "transformers",
+      "research"
+    ],
+    "status": "ready",
+    "created_date": "2025-11-05T16:20:00Z"
+  }
+];

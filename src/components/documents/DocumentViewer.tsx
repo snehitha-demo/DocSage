@@ -139,7 +139,7 @@ export default function DocumentViewer({ document, onClose }: DocumentViewerProp
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                {/* PDF Preview Placeholder */}
+                {/* Document Content Display */}
                 <div className="bg-gradient-to-br from-slate-100 to-slate-200 rounded-xl p-12 mb-6">
                   <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-auto">
                     <div className="space-y-4">
@@ -147,6 +147,10 @@ export default function DocumentViewer({ document, onClose }: DocumentViewerProp
                         <FileText className="w-6 h-6 text-blue-600" />
                         <h3 className="text-xl font-bold text-slate-900">{document.title}</h3>
                       </div>
+                      
+                      {document.description && (
+                        <p className="text-slate-700 text-sm">{document.description}</p>
+                      )}
                       
                       <div className="space-y-3">
                         <div className="h-3 bg-slate-200 rounded w-full"></div>
